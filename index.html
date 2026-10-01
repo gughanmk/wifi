@@ -66,7 +66,12 @@
               <label class="field-label">Rotate image<select id="rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">90° counterclockwise</option></select></label>
               <label class="select-only"><input id="selectionMode" type="checkbox" /><span><b>Selected area only</b><small>Draw on preview</small></span></label>
             </div>
-            <button class="clear-selection" id="clearSelection" type="button">Clear selected area</button>
+            <div class="advanced-row">
+              <label class="mini-toggle"><input id="flipHorizontal" type="checkbox" /> Mirror horizontal</label>
+              <label class="mini-toggle"><input id="flipVertical" type="checkbox" /> Mirror vertical</label>
+              <label class="mini-toggle"><input id="multiSelect" type="checkbox" /> Multiple areas</label>
+            </div>
+            <div class="selection-actions"><button class="clear-selection" id="addSelection" type="button">+ Add selection area</button><button class="clear-selection" id="clearSelection" type="button">Clear selected areas</button></div>
             <button class="export-button" id="exportButton" disabled><span>↓</span> Download animation</button>
             <p class="export-note" id="exportNote">Upload an image to enable export.</p>
           </div>
