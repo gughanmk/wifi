@@ -26,7 +26,8 @@
           </label>
 
           <div class="control-group">
-            <div class="section-label"><span>Animation</span><span class="count">30 styles</span></div>
+            <div class="section-label"><span>Animation</span><span class="count">200 styles</span></div>
+            <input class="effect-search" id="effectSearch" type="search" placeholder="Search 200 animations" aria-label="Search animations" />
             <div class="effect-grid" id="effectGrid" role="radiogroup" aria-label="Animation style"></div>
           </div>
 
@@ -65,6 +66,7 @@
               <label class="field-label">Rotate image<select id="rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">90° counterclockwise</option></select></label>
               <label class="select-only"><input id="selectionMode" type="checkbox" /><span><b>Selected area only</b><small>Draw on preview</small></span></label>
             </div>
+            <button class="clear-selection" id="clearSelection" type="button">Clear selected area</button>
             <button class="export-button" id="exportButton" disabled><span>↓</span> Download animation</button>
             <p class="export-note" id="exportNote">Upload an image to enable export.</p>
           </div>

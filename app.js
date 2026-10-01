@@ -16,18 +16,15 @@ const durationSelect = $('#exportDuration');
 const exportButton = $('#exportButton');
 const exportNote = $('#exportNote');
 
-const effects = [
-  ['pan', 'Gentle pan', 'Side to side'], ['pan', 'Pan left', 'Slow return'], ['pan', 'Pan right', 'Slow return'],
-  ['zoom', 'Slow zoom', 'Breathing scale'], ['zoom', 'Zoom in', 'Cinematic push'], ['zoom', 'Zoom out', 'Open space'],
-  ['color', 'Color drift', 'Ambient tint'], ['color', 'Golden hour', 'Warm light'], ['color', 'Neon pulse', 'Bold color'],
-  ['wave', 'Soft waves', 'Fluid motion'], ['wave', 'Ocean ripple', 'Wide current'], ['wave', 'Heat haze', 'Fine distortion'],
-  ['orbit', 'Orbit', 'Floating circle'], ['orbit', 'Float up', 'Weightless'], ['orbit', 'Float down', 'Gentle fall'],
-  ['ripple', 'Water rings', 'Radiating ripple'], ['ripple', 'Liquid glass', 'Lens wobble'], ['ripple', 'Storm ripple', 'Fast rings'],
-  ['drift', 'Diagonal drift', 'Across frame'], ['drift', 'Parallax', 'Layered feel'], ['drift', 'Wind sway', 'Natural move'],
-  ['pulse', 'Soft pulse', 'Light breath'], ['pulse', 'Heartbeat', 'Rhythmic scale'], ['pulse', 'Focus pulse', 'Center energy'],
-  ['tilt', 'Tilt left', 'Subtle angle'], ['tilt', 'Tilt right', 'Subtle angle'], ['tilt', 'Sway', 'Alternating tilt'],
-  ['blur', 'Dream blur', 'Soft focus'], ['blur', 'Film grain', 'Textured light'], ['blur', 'Chromatic shift', 'Split color'],
-].map(([type, name, subtitle], index) => ({ type, name, subtitle, variant: index % 3 }));
+const effectFamilies = [
+  ['pan', 'Pan'], ['zoom', 'Zoom'], ['color', 'Color'], ['wave', 'Wave'], ['orbit', 'Orbit'],
+  ['ripple', 'Ripple'], ['drift', 'Drift'], ['pulse', 'Pulse'], ['tilt', 'Tilt'], ['blur', 'Texture'],
+];
+const styleNames = ['Aurora', 'Breeze', 'Cinematic', 'Dawn', 'Ember', 'Float', 'Glow', 'Horizon', 'Ink', 'Jewel', 'Kinetic', 'Lunar', 'Mist', 'Nova', 'Opal', 'Prism', 'Quiet', 'Radiant', 'Solar', 'Velvet'];
+const effects = effectFamilies.flatMap(([type, family]) => styleNames.map((style, variant) => ({
+  type, variant, name: `${family} ${style}`, subtitle: `${family.toLowerCase()} motion · variation ${variant + 1}`,
+})));
+
 
 let effect = effects[0];
 let playing = true;
@@ -39,7 +36,13 @@ let selection = [0.25, 0.25, 0.75, 0.75];
 let drawingSelection = false;
 let selectionStart = null;
 
-$('#effectGrid').innerHTML = effects.map((item, index) => `<button class="effect ${index === 0 ? 'selected' : ''}" data-index="${index}" role="radio" aria-checked="${index === 0}"><span class="effect-icon effect-${item.type}"></span><strong>${item.name}</strong><small>${item.subtitle}</small></button>`).join('');
+const effectGrid = $('#effectGrid');
+function renderEffects(query = '') {
+  const term = query.trim().toLowerCase();
+  effectGrid.innerHTML = effects.map((item, index) => ({ item, index })).filter(({ item }) => !term || `${item.name} ${item.subtitle}`.toLowerCase().includes(term)).map(({ item, index }) => `<button class="effect ${effect === item ? 'selected' : ''}" data-index="${index}" role="radio" aria-checked="${effect === item}"><span class="effect-icon effect-${item.type}"></span><strong>${item.name}</strong><small>${item.subtitle}</small></button>`).join('') || '<p class="no-effects">No animations match your search.</p>';
+}
+renderEffects();
+$('#effectSearch').addEventListener('input', (event) => renderEffects(event.target.value));
 
 const gl = canvas.getContext('webgl', { premultipliedAlpha: false, preserveDrawingBuffer: false });
 if (!gl) throw new Error('WebGL is required to render this animation.');
@@ -67,12 +70,13 @@ frame.addEventListener('pointerdown', (event) => { if (!selectionMode.checked ||
 frame.addEventListener('pointermove', (event) => { if (!drawingSelection) return; const [x,y] = previewPoint(event); selection = [Math.min(selectionStart[0],x),Math.min(selectionStart[1],y),Math.max(selectionStart[0],x),Math.max(selectionStart[1],y)]; setSelectionBox(); });
 frame.addEventListener('pointerup', () => { drawingSelection = false; });
 selectionMode.addEventListener('change', () => { selectionBox.classList.toggle('visible', selectionMode.checked); setExportNote(selectionMode.checked ? 'Draw on the preview to animate only that area.' : 'The full image will animate.', 'success'); });
+$('#clearSelection').addEventListener('click', () => { selection = [0.25, 0.25, 0.75, 0.75]; selectionMode.checked = false; selectionBox.classList.remove('visible'); setSelectionBox(); setExportNote('Selected-area animation cleared.', 'success'); });
 sizeSelect.addEventListener('change', () => { presetSelect.value = 'custom'; resizeCanvas(); });
 presetSelect.addEventListener('change', () => { const values = { youtube:'1920x1080',short:'1080x1920',instagram:'1080x1080',reel:'1080x1920',tiktok:'1080x1920',x:'1600x900' }; if (values[presetSelect.value]) sizeSelect.value = values[presetSelect.value]; resizeCanvas(); });
 upload.addEventListener('change', (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { sourceImage = new Image(); sourceImage.onload = () => { gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,sourceImage); placeholder.classList.add('hidden'); exportButton.disabled = false; resizeCanvas(); startTime = performance.now(); setExportNote('Ready to render your selected size and quality.', 'success'); }; sourceImage.src = reader.result; }; reader.readAsDataURL(file); });
-document.querySelectorAll('.effect').forEach((button) => button.addEventListener('click', () => { $('.effect.selected').classList.remove('selected'); $('[aria-checked="true"]').setAttribute('aria-checked','false'); button.classList.add('selected'); button.setAttribute('aria-checked','true'); effect = effects[Number(button.dataset.index)]; $('#effectTitle').textContent = effect.name; startTime = performance.now(); }));
+effectGrid.addEventListener('click', (event) => { const button = event.target.closest('.effect'); if (!button) return; effect = effects[Number(button.dataset.index)]; $('#effectTitle').textContent = effect.name; startTime = performance.now(); renderEffects($('#effectSearch').value); });
 intensity.addEventListener('input', () => { $('#intensityValue').textContent = `${intensity.value}%`; }); tempo.addEventListener('input', () => { $('#tempoValue').textContent = `${(+tempo.value/10).toFixed(1)}×`; });
 function togglePlayback() { const currentElapsed=elapsed(performance.now()); playing=!playing; if(!playing) pausedAt=currentElapsed; else startTime=performance.now()-pausedAt*1000; const button=$('#playButton'); button.classList.toggle('paused',!playing); button.innerHTML=`<span></span>${playing?'Pause':'Play'}`; button.setAttribute('aria-label',playing?'Pause animation':'Play animation'); }
-$('#playButton').addEventListener('click',togglePlayback); document.addEventListener('keydown',(event)=>{if(event.code==='Space'&&event.target.tagName!=='INPUT'&&event.target.tagName!=='SELECT'){event.preventDefault();togglePlayback();}}); $('#resetButton').addEventListener('click',()=>{intensity.value=42;tempo.value=8;sizeSelect.value='1280x720';presetSelect.value='custom';rotationSelect.value='0';selectionMode.checked=false;selectionBox.classList.remove('visible');intensity.dispatchEvent(new Event('input'));tempo.dispatchEvent(new Event('input'));$('.effect').click();resizeCanvas();});
+$('#playButton').addEventListener('click',togglePlayback); document.addEventListener('keydown',(event)=>{if(event.code==='Space'&&event.target.tagName!=='INPUT'&&event.target.tagName!=='SELECT'){event.preventDefault();togglePlayback();}}); $('#resetButton').addEventListener('click',()=>{intensity.value=42;tempo.value=8;sizeSelect.value='1280x720';presetSelect.value='custom';rotationSelect.value='0';selectionMode.checked=false;selectionBox.classList.remove('visible');intensity.dispatchEvent(new Event('input'));tempo.dispatchEvent(new Event('input'));effect = effects[0]; $('#effectSearch').value = ''; renderEffects(); $('#effectTitle').textContent = effect.name; resizeCanvas();});
 function recorderOptions() { const requested=formatSelect.value==='mp4'?['video/mp4;codecs=avc1','video/mp4']:['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']; const mimeType=requested.find((type)=>MediaRecorder.isTypeSupported(type)); return {mimeType,videoBitsPerSecond:{standard:5_000_000,high:12_000_000,ultra:24_000_000}[qualitySelect.value]}; }
 exportButton.addEventListener('click',()=>{if(!sourceImage||exportInProgress)return;if(!canvas.captureStream||!window.MediaRecorder){setExportNote('Video export is not supported in this browser.','error');return;}const options=recorderOptions();if(!options.mimeType){setExportNote(`${formatSelect.value.toUpperCase()} export is not supported here. Try WebM.`,'error');return;}exportInProgress=true;const seconds=Number(durationSelect.value),wasPlaying=playing;if(!playing)togglePlayback();exportButton.disabled=true;exportButton.textContent=`Rendering ${seconds}s video…`;setExportNote(`Recording ${selectedDimensions().join(' × ')} at ${qualitySelect.value} quality.`,'success');const stream=canvas.captureStream(30),chunks=[],recorder=new MediaRecorder(stream,options);recorder.ondataavailable=(event)=>{if(event.data.size)chunks.push(event.data);};recorder.onstop=()=>{const extension=options.mimeType.includes('mp4')?'mp4':'webm',blob=new Blob(chunks,{type:options.mimeType}),link=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`motion-canvas-${canvas.width}x${canvas.height}.${extension}`});link.click();URL.revokeObjectURL(link.href);stream.getTracks().forEach((track)=>track.stop());exportInProgress=false;exportButton.disabled=false;exportButton.innerHTML='<span>↓</span> Download animation';setExportNote('Your animation download is ready.','success');if(!wasPlaying)togglePlayback();};recorder.start(200);window.setTimeout(()=>recorder.stop(),seconds*1000);});
