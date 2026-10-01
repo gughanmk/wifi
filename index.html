@@ -26,13 +26,8 @@
           </label>
 
           <div class="control-group">
-            <div class="section-label"><span>Animation</span><span class="count">04 styles</span></div>
-            <div class="effect-grid" role="radiogroup" aria-label="Animation style">
-              <button class="effect selected" data-effect="pan" role="radio" aria-checked="true"><span class="effect-icon pan-icon"></span><strong>Gentle pan</strong><small>Side to side</small></button>
-              <button class="effect" data-effect="zoom" role="radio" aria-checked="false"><span class="effect-icon zoom-icon"></span><strong>Slow zoom</strong><small>Breathing scale</small></button>
-              <button class="effect" data-effect="color" role="radio" aria-checked="false"><span class="effect-icon color-icon"></span><strong>Color drift</strong><small>Ambient tint</small></button>
-              <button class="effect" data-effect="wave" role="radio" aria-checked="false"><span class="effect-icon wave-icon"></span><strong>Soft waves</strong><small>Fluid motion</small></button>
-            </div>
+            <div class="section-label"><span>Animation</span><span class="count">30 styles</span></div>
+            <div class="effect-grid" id="effectGrid" role="radiogroup" aria-label="Animation style"></div>
           </div>
 
           <div class="control-group sliders">
@@ -41,6 +36,17 @@
           </div>
           <div class="control-group export-controls">
             <div class="section-label"><span>Export animation</span><span class="count">video file</span></div>
+            <label class="field-label">Screen preset
+              <select id="screenPreset">
+                <option value="custom">Custom canvas</option>
+                <option value="youtube">YouTube video · 1920 × 1080</option>
+                <option value="short">YouTube Short · 1080 × 1920</option>
+                <option value="instagram">Instagram post · 1080 × 1080</option>
+                <option value="reel">Instagram Reel · 1080 × 1920</option>
+                <option value="tiktok">TikTok · 1080 × 1920</option>
+                <option value="x">X / Twitter · 1600 × 900</option>
+              </select>
+            </label>
             <label class="field-label">Canvas size
               <select id="canvasSize">
                 <option value="1280x720">Landscape · 1280 × 720</option>
@@ -55,6 +61,10 @@
               <label class="field-label">Quality<select id="exportQuality"><option value="high">High</option><option value="ultra">Ultra</option><option value="standard">Standard</option></select></label>
             </div>
             <label class="field-label">Length<select id="exportDuration"><option value="3">3 seconds</option><option value="5" selected>5 seconds</option><option value="8">8 seconds</option></select></label>
+            <div class="export-row">
+              <label class="field-label">Rotate image<select id="rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">90° counterclockwise</option></select></label>
+              <label class="select-only"><input id="selectionMode" type="checkbox" /><span><b>Selected area only</b><small>Draw on preview</small></span></label>
+            </div>
             <button class="export-button" id="exportButton" disabled><span>↓</span> Download animation</button>
             <p class="export-note" id="exportNote">Upload an image to enable export.</p>
           </div>
@@ -65,6 +75,7 @@
           <header class="preview-header"><div><p class="eyebrow">Live preview</p><h2 id="effectTitle">Gentle pan</h2></div><button class="play-button" id="playButton" aria-label="Pause animation"><span></span>Pause</button></header>
           <div class="canvas-frame" id="canvasFrame">
             <canvas id="glCanvas" aria-label="Animated uploaded image preview"></canvas>
+            <div class="selection-box" id="selectionBox" aria-hidden="true"></div>
             <div class="placeholder" id="placeholder"><div class="placeholder-orb"></div><p>Drop an image here<br /><span>to start creating motion</span></p></div>
             <div class="frame-corner top-left"></div><div class="frame-corner top-right"></div><div class="frame-corner bottom-left"></div><div class="frame-corner bottom-right"></div>
             <div class="canvas-meta"><span id="resolution">Ready for input</span><span class="live-badge"><i></i>LIVE</span></div>
