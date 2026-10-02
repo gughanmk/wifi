@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Motion Canvas — Image Animator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <nav class="topbar">
+        <a class="brand" href="#" aria-label="Motion Canvas home"><span class="brand-mark">M</span>motion canvas</a>
+        <div class="topbar-right"><span class="status-dot"></span><span>WebGL active</span><button class="ghost-button" id="resetButton">Reset</button></div>
+      </nav>
+
+      <section class="workspace">
+        <aside class="controls" aria-label="Animation controls">
+          <div class="panel-heading"><p class="eyebrow">Image motion lab</p><h1>Bring a still<br />to life.</h1><p class="intro">Upload an image, then tune its movement in real time.</p></div>
+
+          <label class="upload-card" for="imageUpload" id="uploadCard">
+            <input id="imageUpload" type="file" accept="image/*" />
+            <span class="upload-icon">↑</span><span><strong>Upload an image</strong><small>JPG, PNG, WEBP or GIF</small></span>
+          </label>
+
+          <div class="control-group">
+            <div class="section-label"><span>Animation</span><span class="count">1,000 styles</span></div>
+            <input class="effect-search" id="effectSearch" type="search" placeholder="Search 1,000 animations" aria-label="Search animations" />
+            <div class="effect-grid" id="effectGrid" role="radiogroup" aria-label="Animation style"></div>
+          </div>
+
+          <div class="control-group sliders">
+            <label><span>Intensity <output id="intensityValue">42%</output></span><input id="intensity" type="range" min="5" max="100" value="42" /></label>
+            <label><span>Tempo <output id="tempoValue">0.8×</output></span><input id="tempo" type="range" min="2" max="18" value="8" /></label>
+          </div>
+          <div class="control-group export-controls">
+            <div class="section-label"><span>Export animation</span><span class="count">video file</span></div>
+            <label class="field-label">Screen preset
+              <select id="screenPreset">
+                <option value="custom">Custom canvas</option>
+                <option value="youtube">YouTube video · 1920 × 1080</option>
+                <option value="short">YouTube Short · 1080 × 1920</option>
+                <option value="instagram">Instagram post · 1080 × 1080</option>
+                <option value="reel">Instagram Reel · 1080 × 1920</option>
+                <option value="tiktok">TikTok · 1080 × 1920</option>
+                <option value="x">X / Twitter · 1600 × 900</option>
+              </select>
+            </label>
+            <label class="field-label">Canvas size
+              <select id="canvasSize">
+                <option value="1280x720">Landscape · 1280 × 720</option>
+                <option value="1920x1080">Full HD · 1920 × 1080</option>
+                <option value="1080x1080">Square · 1080 × 1080</option>
+                <option value="1080x1350">Portrait · 1080 × 1350</option>
+                <option value="1080x1920">Story · 1080 × 1920</option>
+                <option value="1600x900">Wide · 1600 × 900</option>
+                <option value="original">Original image size</option>
+              </select>
+            </label>
+            <div class="export-row">
+              <label class="field-label">Format<select id="exportFormat"><option value="webm">WebM video</option><option value="mp4">MP4 video</option></select></label>
+              <label class="field-label">Quality<select id="exportQuality"><option value="high">High</option><option value="ultra">Ultra</option><option value="standard">Standard</option></select></label>
+            </div>
+            <label class="field-label">Length<select id="exportDuration"><option value="3">3 seconds</option><option value="5" selected>5 seconds</option><option value="8">8 seconds</option></select></label>
+            <label class="field-label">Frame rate<select id="exportFps"><option value="24">24 FPS · cinematic</option><option value="30" selected>30 FPS · standard</option><option value="60">60 FPS · smooth</option></select></label>
+            <div class="export-row">
+              <label class="field-label">Rotate image<select id="rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">90° counterclockwise</option></select></label>
+              <label class="select-only"><input id="selectionMode" type="checkbox" /><span><b>Selected area only</b><small>Draw on preview</small></span></label>
+            </div>
+            <div class="advanced-row">
+              <label class="mini-toggle"><input id="flipHorizontal" type="checkbox" /> Mirror horizontal</label>
+              <label class="mini-toggle"><input id="flipVertical" type="checkbox" /> Mirror vertical</label>
+              <label class="mini-toggle"><input id="multiSelect" type="checkbox" /> Multiple areas</label>
+            </div>
+            <label class="field-label">Selection shape<select id="selectionShape"><option value="rect">Rectangle / square</option><option value="circle">Circle / wheel</option><option value="polygon">Diamond / polygon</option></select></label>
+            <div class="selection-actions"><button class="clear-selection" id="addSelection" type="button">+ Add selection area</button><button class="clear-selection" id="staggerAreas" type="button">Stagger area motion</button><button class="clear-selection" id="clearSelection" type="button">Clear selected areas</button></div>
+            <div class="selection-manager" id="selectionManager" aria-live="polite"></div>
+            <div class="area-effect-picker" id="areaEffectPicker" hidden></div>
+            <button class="export-button" id="exportButton" disabled><span>↓</span> Download animation</button>
+            <p class="export-note" id="exportNote">Upload an image to enable export.</p>
+          </div>
+          <p class="engine-note"><span></span>Rendered locally in your browser</p>
+        </aside>
+
+        <section class="preview-area" aria-label="Animation preview">
+          <header class="preview-header"><div><p class="eyebrow">Live preview</p><h2 id="effectTitle">Gentle pan</h2></div><button class="play-button" id="playButton" aria-label="Pause animation"><span></span>Pause</button></header>
+          <div class="canvas-frame" id="canvasFrame">
+            <canvas id="glCanvas" aria-label="Animated uploaded image preview"></canvas>
+            <div class="selection-box" id="selectionBox" aria-hidden="true"><button class="selection-delete" type="button" aria-label="Delete selected area">×</button><button class="selection-fx" type="button" aria-label="Choose area animation">FX</button><span class="selection-handle" aria-label="Resize selected area"></span></div>
+            <div class="placeholder" id="placeholder"><div class="placeholder-orb"></div><p>Drop an image here<br /><span>to start creating motion</span></p></div>
+            <div class="frame-corner top-left"></div><div class="frame-corner top-right"></div><div class="frame-corner bottom-left"></div><div class="frame-corner bottom-right"></div>
+            <div class="canvas-meta"><span id="resolution">Ready for input</span><span class="live-badge"><i></i>LIVE</span></div>
+          </div>
+          <footer class="preview-footer"><span><i class="spark"></i>Changes are previewed instantly</span><span class="shortcut">SPACE <b>to pause</b></span></footer>
+        </section>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
