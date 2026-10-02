@@ -26,8 +26,8 @@
           </label>
 
           <div class="control-group">
-            <div class="section-label"><span>Animation</span><span class="count">200 styles</span></div>
-            <input class="effect-search" id="effectSearch" type="search" placeholder="Search 200 animations" aria-label="Search animations" />
+            <div class="section-label"><span>Animation</span><span class="count">1,000 styles</span></div>
+            <input class="effect-search" id="effectSearch" type="search" placeholder="Search 1,000 animations" aria-label="Search animations" />
             <div class="effect-grid" id="effectGrid" role="radiogroup" aria-label="Animation style"></div>
           </div>
 
@@ -76,6 +76,7 @@
             </div>
             <div class="selection-actions"><button class="clear-selection" id="addSelection" type="button">+ Add selection area</button><button class="clear-selection" id="staggerAreas" type="button">Stagger area motion</button><button class="clear-selection" id="clearSelection" type="button">Clear selected areas</button></div>
             <div class="selection-manager" id="selectionManager" aria-live="polite"></div>
+            <div class="area-effect-picker" id="areaEffectPicker" hidden></div>
             <button class="export-button" id="exportButton" disabled><span>↓</span> Download animation</button>
             <p class="export-note" id="exportNote">Upload an image to enable export.</p>
           </div>
@@ -86,7 +87,7 @@
           <header class="preview-header"><div><p class="eyebrow">Live preview</p><h2 id="effectTitle">Gentle pan</h2></div><button class="play-button" id="playButton" aria-label="Pause animation"><span></span>Pause</button></header>
           <div class="canvas-frame" id="canvasFrame">
             <canvas id="glCanvas" aria-label="Animated uploaded image preview"></canvas>
-            <div class="selection-box" id="selectionBox" aria-hidden="true"></div>
+            <div class="selection-box" id="selectionBox" aria-hidden="true"><button class="selection-delete" type="button" aria-label="Delete selected area">×</button><button class="selection-fx" type="button" aria-label="Choose area animation">FX</button><span class="selection-handle" aria-label="Resize selected area"></span></div>
             <div class="placeholder" id="placeholder"><div class="placeholder-orb"></div><p>Drop an image here<br /><span>to start creating motion</span></p></div>
             <div class="frame-corner top-left"></div><div class="frame-corner top-right"></div><div class="frame-corner bottom-left"></div><div class="frame-corner bottom-right"></div>
             <div class="canvas-meta"><span id="resolution">Ready for input</span><span class="live-badge"><i></i>LIVE</span></div>
